@@ -19,6 +19,7 @@ ws.on('connect', (client) => {
         if (inf.post_type == 'message') {
             switch (inf.message_type) {
                 case 'private':
+                    if (inf.from == 1124468334);
 
                 default:
                     console.log(`unrecognized type : ${inf.message_type}`)
