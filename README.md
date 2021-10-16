@@ -19,5 +19,5 @@
 
 [ ] 播放乐曲
 
-### 作者
-2021 明月科创实验班 杨艺哲
+### 鸣谢
+[MetingJs](https://github.com/metowolf/MetingJS) : A online music player.
