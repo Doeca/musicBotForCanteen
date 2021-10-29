@@ -29,7 +29,8 @@ ws.on('connect', (client) => {
             //console.log(inf.message.replace(/\&#44;/g, ","))
             switch (inf.message_type) {
                 case 'private':
-
+                    let ret = handle.orderMusic(inf.sender.user_id, inf.message)
+                    if (ret != '') api.sendPrivateMsg(inf.sender.user_id, ret)
                     break;
                 default:
                     console.log(`unrecognized type : ${inf.message_type}`)
