@@ -4,8 +4,8 @@
     <title>小老虎食堂 - 音乐播放</title>
     <meta charset="utf-8">
     <!-- require APlayer -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+    <link rel="stylesheet" href="APlayer.min.css">
+    <script src="APlayer.min.js"></script>
     <!-- require jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </header>
@@ -26,20 +26,60 @@
         loop: 'none',
         order: 'list',
         preload: 'auto',
-        volume: 0.7,
+        volume: 1,
         mutex: true,
         listFolded: false,
         listMaxHeight: 90,
         lrcType: 3,
-        audio: []
     });
 
-    fetch(apiUrl + "getMusicList?erase=0&onlyNew=1").then((res) => {
-        if (res.status != 200) {
-            alert('获取歌曲列表失败，请重载网页！');
-            return;
-        }
-    })
+    function loadPlayer() {
+        fetch(apiUrl + "getMusicList?erase=0&onlyNew=1", {
+            mode: "no-cors"
+        }).then((res) => {
+            if (res.status != 200) {
+                alert('获取歌曲列表失败，请重载网页！');
+                return;
+            }
+
+            let arr = res.json();
+            return arr;
+        }).then(arr => {
+            if (arr == undefined) return;
+            arr.forEach((val, index) => {
+                let url = "https://api.i-meto.com/meting/api?server=" + (val.music.type == 1 ? 'netease' : "tencent") + "&type=song&id=" + val.music.id + "&r=" + Math.random();
+                fetch(url, {
+                        mode: "cors"
+                    })
+                    .then(resp => {
+                        resp.json().then(inf => {
+                            if (inf.length <= 0) {
+                                //待写，上报告知加载失败
+                                return;
+                            }
+                            console.log(inf);
+                            ap.list.add({
+                                "name": inf[0].title,
+                                "artist": inf[0].author,
+                                "url": inf[0].url,
+                                "cover": inf[0].pic,
+                                "lrc": inf[0].lrc
+                            })
+                            ap.list.show();
+                        });
+
+
+
+                    })
+            });
+
+        })
+    }
+    loadPlayer();
+
+    setInterval((handler) => {
+        loadPlayer()
+    }, 10000);
 </script>
 
 

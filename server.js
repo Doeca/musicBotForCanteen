@@ -2,18 +2,13 @@
 server part: to show the front page.
 */
 const express = require('express');
-const handle = require('./handle');
 const app = express()
 
-app.get('/index.html', function(req, res) {
-    res.sendFile("./front/index.html");
-})
-app.get('/', function(req, res) {
-    res.sendFile("./front/index.html");
-})
+
+app.use('/', express.static('front'));
 
 function server(p_handle) {
-    handle = p_handle;
+    let handle = p_handle;
 
     this.start = function() {
         var server = app.listen(8080, function() {
@@ -27,7 +22,7 @@ function server(p_handle) {
         })
 
         app.get("/setMusicStatus", (req, res) => {
-
+            res.send(handle.setMusicStatus(req.query.id)) //设置歌曲为播放完的
         })
     }
 

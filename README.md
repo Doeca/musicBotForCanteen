@@ -3,9 +3,9 @@
 
 ### 后端计划任务
 
-[ ] 多平台点歌解析
+[x] 多平台点歌解析
 
-[ ] 用户点歌记录
+[x] 用户点歌记录
 
 [ ] 歌词审查
 
@@ -17,7 +17,8 @@
 
 ### 前端计划任务
 
-[ ] 播放乐曲
+[x] 播放乐曲
 
 ### 鸣谢
-[MetingJs](https://github.com/metowolf/MetingJS) : A online music player.
+[Aplayer](https://aplayer.js.org) : 播放器
+[MetingJs](https://github.com/metowolf/MetingJS) : 提供音乐解析API

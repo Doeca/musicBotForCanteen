@@ -2,7 +2,7 @@ const websocketClient = require('websocket').client
 const server = require('./server')
 const miraiApi = require('./miraiApi')
 const url = "ws://127.0.0.1:23663/"
-const handle = new require('./handle')()
+const handle = new(require('./handle'))()
 
 // initialize server
 let frontServer = new server(handle)
@@ -39,7 +39,7 @@ ws.on('connect', (client) => {
             }
         }
 
-
+        //处理加好友请求
         if (inf.post_type == "request") {
             switch (inf.request_type) {
                 case 'friend':

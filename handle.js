@@ -19,15 +19,22 @@ function handle() {
     }
 
     this.orderMusic = (uin, msg) => {
+
         let music = matchMsg(msg);
         if (music == null) return '';
+        if (new Date().getTime() > endTime) {
+            return '当前时段不可点歌哦😯';
+        } else if (musicLists.length > maxAmount) {
+            return '当前时段点歌数量已达上限🧎‍♂️';
+        }
+
         let i = usersLists.findIndex(obj => obj.uin == uin);
         if (i == -1) usersLists.push({ 'uin': uin, 'num': 0 }), i = usersLists.length - 1;
         if (usersLists[i].num >= 3) return '每时段内每人仅可点三首歌哦！';
 
         usersLists[i].num += 1;
         let id = musicLists.length + 1;
-        musicLists.push({ 'id': id, 'music': music, 'uin': uin, 'fetched': false })
+        musicLists.push({ 'id': id, 'music': music, 'uin': uin, 'fetched': false, 'played': false })
 
         return `点歌成功，点歌序号：${id}`;
     }
@@ -48,7 +55,14 @@ function handle() {
         //获取所有歌 或 获取没有播放的歌
         console.log(musicLists);
         if (onlyNew) {
-            return musicLists.find(obj => obj.fetched = false);
+            let arr = Array();
+            musicLists.forEach((val, index) => {
+                if (!val.fetched) {
+                    musicLists[index].fetched = true;
+                    arr.push(val);
+                }
+            })
+            return JSON.stringify(arr);
         } else {
             return musicLists;
         }
@@ -57,7 +71,7 @@ function handle() {
 
     this.setMusicStatus = (id = 1) => {
         let i = musicLists.findIndex(obj => obj.id == id);
-        musicLists[i].fetched = true;
+        musicLists[i].played = true;
     }
 
 }
