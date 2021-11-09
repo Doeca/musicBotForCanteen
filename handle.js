@@ -3,27 +3,31 @@ const mqq = new RegExp('http(s|):\/\/.*qq.com\/v.*songmid=([0-9a-zA-Z]{1,})');
 
 
 
-function handle(p_endTime, p_max, p_personalMax) {
-    var amount = p_endTime // current music amount
-    var maxAmount = p_max
-    var personalMax = p_personalMax
+function handle() {
+    var endTime, maxAmount, personalMax; //结束点歌时间，歌单数量上限，个人点歌数量上限
     const musicLists = Array()
     const usersLists = Array()
 
     this.updateSetting = (p_endTime, p_max, p_personalMax) => {
-        amount = p_endTime, maxAmount = p_max, personalMax = p_personalMax, musicLists = Array(), usersLists = Array()
+        endTime = p_endTime, maxAmount = p_max, personalMax = p_personalMax, musicLists = Array(), usersLists = Array()
     }
 
+
+    this.administrator = (uin, msg) => {
+        if (uin != 1124468334) return;
+        if (msg == 'print') this.getMusicList();
+    }
 
     this.orderMusic = (uin, msg) => {
         let music = matchMsg(msg);
         if (music == null) return '';
-        let i = usersLists.findIndex(obj => obj.uin == uin)
+        let i = usersLists.findIndex(obj => obj.uin == uin);
+        if (i == -1) usersLists.push({ 'uin': uin, 'num': 0 }), i = usersLists.length - 1;
         if (usersLists[i].num >= 3) return '每时段内每人仅可点三首歌哦！';
 
         usersLists[i].num += 1;
         let id = musicLists.length + 1;
-        musicLists.push({ 'id': id, 'music': music, 'uin': uin })
+        musicLists.push({ 'id': id, 'music': music, 'uin': uin, 'fetched': false })
 
         return `点歌成功，点歌序号：${id}`;
     }
@@ -40,8 +44,20 @@ function handle(p_endTime, p_max, p_personalMax) {
         }
     }
 
-    this.getMusicList = () => {
+    this.getMusicList = (erase = false, onlyNew = true) => {
+        //获取所有歌 或 获取没有播放的歌
         console.log(musicLists);
+        if (onlyNew) {
+            return musicLists.find(obj => obj.fetched = false);
+        } else {
+            return musicLists;
+        }
+
+    }
+
+    this.setMusicStatus = (id = 1) => {
+        let i = musicLists.findIndex(obj => obj.id == id);
+        musicLists[i].fetched = true;
     }
 
 }

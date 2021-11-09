@@ -6,23 +6,41 @@
     <!-- require APlayer -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
     <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-    <!-- require MetingJS -->
-    <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+    <!-- require jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </header>
 
 <body>
 
-
-    <meting-js server="netease" type="playlist" id="60198">
-    </meting-js>
+    <div id="player"></div>
 
 
 </body>
+<script>
+    let apiUrl = 'http://127.0.0.1:8080/';
+    const ap = new APlayer({
+        container: document.getElementById('player'),
+        mini: false,
+        autoplay: false,
+        theme: '#FADFA3',
+        loop: 'none',
+        order: 'list',
+        preload: 'auto',
+        volume: 0.7,
+        mutex: true,
+        listFolded: false,
+        listMaxHeight: 90,
+        lrcType: 3,
+        audio: []
+    });
 
-<footer>
-    <div>
-        <a>Powered by </a><a href="https://github.com/metowolf/Meting" target="_blank">Meting</a>
-    </div>
-</footer>
+    fetch(apiUrl + "getMusicList?erase=0&onlyNew=1").then((res) => {
+        if (res.status != 200) {
+            alert('获取歌曲列表失败，请重载网页！');
+            return;
+        }
+    })
+</script>
+
 
 </html>

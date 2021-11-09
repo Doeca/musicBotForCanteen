@@ -1,11 +1,11 @@
 const websocketClient = require('websocket').client
 const server = require('./server')
-const Handle = require('./handle')
 const miraiApi = require('./miraiApi')
 const url = "ws://127.0.0.1:23663/"
+const handle = new require('./handle')()
 
 // initialize server
-let frontServer = new server()
+let frontServer = new server(handle)
 frontServer.start()
     // Basic connection
 console.log("Connecting")
@@ -15,7 +15,6 @@ let ws = new websocketClient()
 ws.on('connect', (client) => {
     // initialize api module
     let api = new miraiApi(client)
-    let handle = new Handle(0, 0, 0)
     console.log("WebSocket Client Connected");
 
     client.on('message', (msg) => {
@@ -29,8 +28,11 @@ ws.on('connect', (client) => {
             //console.log(inf.message.replace(/\&#44;/g, ","))
             switch (inf.message_type) {
                 case 'private':
+                    handle.administrator(inf.sender.user_id, inf.message)
+
                     let ret = handle.orderMusic(inf.sender.user_id, inf.message)
                     if (ret != '') api.sendPrivateMsg(inf.sender.user_id, ret)
+
                     break;
                 default:
                     console.log(`unrecognized type : ${inf.message_type}`)
