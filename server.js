@@ -1,25 +1,38 @@
 /*
 server part: to show the front page.
 */
+const express = require('express');
+const handle = require('./handle');
+const app = express()
 
-const http = require('http');
-const fs = require("fs")
+app.get('/index.html', function(req, res) {
+    res.sendFile("./front/index.html");
+})
+app.get('/', function(req, res) {
+    res.sendFile("./front/index.html");
+})
 
+function server(p_handle) {
+    handle = p_handle;
 
-function server() {
     this.start = function() {
-        http.createServer(function(req, res) {
-            //res.writeHead(200, { 'Content-Type': 'html' })
-            if (req.url == '/') {
-                res.end(fs.readFileSync('./front/index.html'));
-            }
-        }).listen(8080);
-        console.log('Server running at http://127.0.0.1:8080/');
+        var server = app.listen(8080, function() {
+            var host = server.address().address
+            var port = server.address().port
+            console.log("应用实例，访问地址为 http://%s:%s", host, port)
+        })
+
+        app.get("/getMusicList", (req, res) => {
+            res.send(handle.getMusicList(req.query.erase == 1, req.query.onlyNew == 1)) //获取歌曲列表
+        })
+
+        app.get("/setMusicStatus", (req, res) => {
+
+        })
     }
 
-
     this.stop = function() {
-        http.stop();
+        server.stop();
     }
 
 }
