@@ -18,6 +18,7 @@
 </body>
 <script>
     let apiUrl = 'http://127.0.0.1:8080/';
+
     const ap = new APlayer({
         container: document.getElementById('player'),
         mini: false,
@@ -32,6 +33,12 @@
         listMaxHeight: 90,
         lrcType: 3,
     });
+
+    function postInf(path, type, msg) {
+        fetch(apiUrl + path, {
+            mode: "no-cors"
+        })
+    }
 
     function loadPlayer() {
         fetch(apiUrl + "getMusicList?erase=0&onlyNew=1", {
@@ -53,19 +60,24 @@
                     })
                     .then(resp => {
                         resp.json().then(inf => {
+
                             if (inf.length <= 0) {
-                                //待写，上报告知加载失败
+                                postInf(`loadError?id=${val.id}&uin=${val.uin}`, "error", "song can't load");
                                 return;
+
                             }
-                            console.log(inf);
+
                             ap.list.add({
                                 "name": inf[0].title,
                                 "artist": inf[0].author,
                                 "url": inf[0].url,
                                 "cover": inf[0].pic,
-                                "lrc": inf[0].lrc
+                                "lrc": inf[0].lrc,
+                                "id": val.id
                             })
+
                             ap.list.show();
+
                         });
 
 
@@ -75,11 +87,20 @@
 
         })
     }
-    loadPlayer();
 
-    setInterval((handler) => {
+    // bind event
+    ap.on('play', () => {
+        let i = ap.list.index;
+        let val = ap.list.audios[i];
+        console.log(`Now playing : ${i}`, val);
+        postInf(`setMusicStatus?id=${val.id}`, "do", "");
+    })
+
+    // initialize
+    loadPlayer();
+    let timerHandler = setInterval((handler) => {
         loadPlayer()
-    }, 10000);
+    }, 5000);
 </script>
 
 
