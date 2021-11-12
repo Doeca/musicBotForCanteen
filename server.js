@@ -24,6 +24,10 @@ function server(p_handle) {
         app.get("/setMusicStatus", (req, res) => {
             res.send(handle.setMusicStatus(req.query.id)) //设置歌曲为播放完的
         })
+
+        app.get("/loadError", (req, res) => {
+            //res.send(handle.)
+        })
     }
 
     this.stop = function() {
