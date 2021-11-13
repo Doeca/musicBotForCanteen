@@ -66,7 +66,7 @@ function handle() {
     }
 
     this.reconnectws = () => {
-        reconnect();
+        return reconnect();
     }
 
     this.setApiAddress = (p_api) => {
