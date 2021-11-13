@@ -187,6 +187,7 @@ function handle() {
 
         switch (msg) {
             case '当前歌曲':
+                if (currentSong == 0) return '👁‍🗨当前没有在播放歌曲';
                 return "当前歌曲【" + getMusic(currentSong).music.title + "】";
             case '歌曲列表':
                 if (musicLists.length == 0) return '😗当前歌曲列表为🈳️';

@@ -68,6 +68,9 @@ ws.on('connect', (client) => {
                         api.sendPrivateMsg(inf.sender.user_id, '🤒点歌失败，请稍后再试');
                     });
 
+                    if (inf.message.substr(0, 14) == 'heart_checking') {
+                        api.sendPrivateMsg(inf.sender.user_id, inf.message);
+                    }
 
                     break;
                 default:
