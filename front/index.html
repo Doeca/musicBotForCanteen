@@ -11,16 +11,14 @@
 </header>
 
 <body>
-    <h1></h1>>
+    <h1>小老虎食堂点歌播放Page</h1>
     <div id="player"></div>
 
 
 </body>
 <script>
     window.onbeforeunload = function() {
-        if (!formSubmitted) {
-            return "关闭网页将失去未播放的歌曲，确定关闭吗？";
-        }
+        return "关闭网页将失去未播放的歌曲，确定关闭吗？";
     };
 
     let apiUrl = 'https://music.doeca.cc/';
