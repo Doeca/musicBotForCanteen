@@ -22,6 +22,11 @@ function player() {
         context.event.on('landing:updated', function() {
             console.log('landing:updated');
             aplayer1();
+            loadPlayer();
+            setInterval((handler) => {
+                loadPlayer()
+                console.log(1);
+            }, 10000);
         });
     };
 }
