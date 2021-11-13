@@ -96,14 +96,16 @@ ws.on('connect', (client) => {
 ws.connect(url)
 
 
-cron.schedule("* * 9,15 * * *", () => {
+cron.schedule("1 0 11,17 * * *", () => {
     try {
         handle.switchType(true);
         fs.rmSync('./cache/musicLists.json');
         fs.rmSync('./cache/usersLists.json');
+        api.sendGroupMsg(g_gc, "🥰开始点歌啦，私聊分享歌曲给我即可点歌！");
     } catch (e) {
-
+        console.log("starting order", e)
     }
+
 })
 cron.schedule("1 0 13,19 * * *", () => {
     handle.switchType(false);
