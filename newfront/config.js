@@ -21,19 +21,11 @@ function player() {
     return function(context) {
         context.event.on('landing:updated', function() {
             console.log('landing:updated');
-            clearPlayer();
             aplayer1();
         });
     };
 }
 
-function clearPlayer() {
-    for (let i = 0; i < 10; i++) {
-        if (window['ap' + i]) {
-            window['ap' + i].destroy();
-        }
-    }
-}
 
 function aplayer1() {
     window.ap1 = new APlayer({
@@ -45,6 +37,13 @@ function aplayer1() {
         preload: 'auto',
         audio: []
     });
+
+    window.ap1.on('play', () => {
+        let i = window.ap1.list.index;
+        let val = window.ap1.list.audios[i];
+        console.log(`Now playing : ${i}`, val);
+        postInf(`setMusicStatus?id=${val.id}`, "do", "");
+    })
 }
 
 function postInf(path, type, msg) {
@@ -102,17 +101,3 @@ function loadPlayer(onlyNew) {
 
     })
 }
-
-// bind event
-window.ap1.on('play', () => {
-    let i = window.ap1.list.index;
-    let val = window.ap1.list.audios[i];
-    console.log(`Now playing : ${i}`, val);
-    postInf(`setMusicStatus?id=${val.id}`, "do", "");
-})
-
-// initialize
-loadPlayer();
-let timerHandler = setInterval((handler) => {
-    loadPlayer()
-}, 10000);
