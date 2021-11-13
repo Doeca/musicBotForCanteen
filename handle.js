@@ -174,7 +174,7 @@ function handle() {
                         musicLists = JSON.parse(fs.readFileSync("./cache/musicLists.json"));
                         usersLists = JSON.parse(fs.readFileSync("./cache/usersLists.json"));
                     } catch (e) {
-
+                        console.log(e);
                     }
                     return 'Success';
                 case `/shut_order`:

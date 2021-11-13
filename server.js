@@ -5,7 +5,7 @@ const express = require('express');
 const app = express()
 
 
-app.use('/', express.static('newfront'));
+app.use('/', express.static('front'));
 
 function server(p_handle) {
     let handle = p_handle;
