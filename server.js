@@ -28,6 +28,10 @@ function server(p_handle) {
         app.get("/loadError", (req, res) => {
             res.send(handle.notifyError(req.query.uin, req.query.id));
         })
+
+        app.get("/reconnect", (req, res) => {
+            res.send(handle.reconnectws())
+        })
     }
 
     this.stop = function() {

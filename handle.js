@@ -12,7 +12,7 @@ function handle() {
     var canOrder = false,
         maxAmount = 50,
         personalMax = 3,
-        api;
+        api, reconnect;
     var currentSong = 0;
     const musicLists = Array()
     const usersLists = Array()
@@ -61,6 +61,13 @@ function handle() {
         return musicLists[i];
     }
 
+    this.setReconnectAddress = (func) => {
+        reconnect = func;
+    }
+
+    this.reconnectws = () => {
+        reconnect();
+    }
 
     this.setApiAddress = (p_api) => {
         api = p_api;
@@ -74,7 +81,6 @@ function handle() {
             usersLists.length = 0;
         }
     }
-
 
     this.administrator = (uin, msg) => {
         if (uin != 1124468334) return;

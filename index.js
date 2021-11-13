@@ -15,6 +15,13 @@ console.log("Connecting")
 let ws = new websocketClient()
 
 
+function reconnect() {
+    ws.connect(url);
+    return "Over";
+}
+
+handle.setReconnectAddress(reconnect);
+
 ws.on('connect', (client) => {
     // initialize api module
     let api = new miraiApi(client);
