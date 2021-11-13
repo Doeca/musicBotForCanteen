@@ -5,6 +5,7 @@ const url = "ws://127.0.0.1:23663/"
 const handle = new(require('./handle'))()
 const cron = require('node-cron')
 const fs = require('fs')
+const g_gc = 191894480;
 
 // initialize server
 let frontServer = new server(handle)
@@ -42,16 +43,22 @@ ws.on('connect', (client) => {
 
         // Router Part
         if (inf.post_type == 'message') {
-            //console.log(inf.message.replace(/\&#44;/g, ","))
+
             switch (inf.message_type) {
+                case 'group':
+                    if (inf.group_id != g_gc) return;
+                    let res = handle.interaction(inf.sender.user_id, inf.message);
+                    if (res != '') api.sendGroupMsg(g_gc, res);
                 case 'private':
                     handle.administrator(inf.sender.user_id, inf.message)
 
                     let ret = handle.orderMusic(inf.sender.user_id, inf.message);
                     ret.then(msg => {
                         if (msg != '') api.sendPrivateMsg(inf.sender.user_id, msg);
-                    }).catch(() => {
-                        api.sendPrivateMsg(inf.sender.user_id, '点歌失败');
+                    }).catch((err) => {
+                        let msg = `Error caught\nerr:${err}`;
+                        api.sendPrivateMsg(1124468334, msg);
+                        api.sendPrivateMsg(inf.sender.user_id, '🤒点歌失败，请稍后再试');
                     });
 
 
@@ -80,10 +87,14 @@ ws.connect(url)
 
 
 cron.schedule("* * 9,15 * * *", () => {
-    handle.switchType(true);
-    fs.rmSync('./cache/musicLists.json');
-    fs.rmSync('./cache/usersLists.json');
+    try {
+        handle.switchType(true);
+        fs.rmSync('./cache/musicLists.json');
+        fs.rmSync('./cache/usersLists.json');
+    } catch (e) {
+
+    }
 })
-cron.schedule("* * 13,19 * * *", () => {
+cron.schedule("1 0 13,19 * * *", () => {
     handle.switchType(false);
 })

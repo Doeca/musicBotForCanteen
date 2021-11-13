@@ -43,9 +43,6 @@ function miraiApi(client) {
 
     this.getGroupMemberInfo = (gc, uin) => {
         let id = Math.random();
-        //callbackLists.set(id + "data", (msg) => {});
-        //callbackLists.set(id + "status", false);
-        //callbackLists.
         cl.send(json2str({
             "action": "get_group_member_info",
             "params": {
@@ -57,18 +54,6 @@ function miraiApi(client) {
         }))
 
         return createCallback(id);
-
-        /*
-        while (true) {
-            if (callbackLists.get(id + "status") == true) {
-                let res = callbackLists.get(id + "data");
-                callbackLists.delete(id + "status");
-                callbackLists.delete(id + "data");
-                return res;
-            }
-        }
-        */
-
     }
 }
 

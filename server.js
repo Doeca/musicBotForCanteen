@@ -26,7 +26,7 @@ function server(p_handle) {
         })
 
         app.get("/loadError", (req, res) => {
-            //res.send(handle.)
+            res.send(handle.notifyError(req.query.uin, req.query.id));
         })
     }
 
