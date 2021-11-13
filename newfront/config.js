@@ -40,6 +40,9 @@ function aplayer1() {
         container: document.getElementById('aplayer1'),
         theme: '#F57F17',
         lrcType: 3,
+        loop: 'none',
+        order: 'list',
+        preload: 'auto',
         audio: []
     });
 }
