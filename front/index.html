@@ -12,6 +12,9 @@
 
 <body>
     <h1>小老虎食堂点歌播放Page</h1>
+    <h2>
+        <a onclick="loadPlayer(0)">点击此处获取历史歌单</a>
+    </h2>
     <div id="player"></div>
 
 
@@ -44,8 +47,8 @@
         })
     }
 
-    function loadPlayer() {
-        fetch(apiUrl + "getMusicList?erase=0&onlyNew=1").then((res) => {
+    function loadPlayer(onlyNew) {
+        fetch(apiUrl + "getMusicList?erase=0&onlyNew=" + (onlyNew === 0 ? 0 : 1)).then((res) => {
             if (res.status != 200) {
                 alert('获取歌曲列表失败，请重载网页！');
                 return;
