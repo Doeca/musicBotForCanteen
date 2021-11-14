@@ -3,7 +3,7 @@ const mqq = new RegExp('http(s|):\/\/.*qq.com\/v.*songmid=([0-9a-zA-Z]{1,})')
 const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
-const g_gc = 191894480;
+const g_gc = 571777125;
 
 
 
@@ -82,12 +82,7 @@ function handle() {
         }
     }
 
-    this.administrator = (uin, msg) => {
-        if (uin != 1124468334) return;
-        if (msg == 'print') this.getMusicList();
-    }
-
-    this.orderMusic = async(uin, msg) => {
+    this.orderMusic = async(uin, msg, ignore) => {
 
         // judge if there is music url existing
         let music = matchMsg(msg);
@@ -100,14 +95,16 @@ function handle() {
         }
 
         // judge if the user is in the offical group and if the user order the excessive music.
-        let memInf = await api.getGroupMemberInfo(g_gc, uin);
-        if (memInf.data == null) return '不在群里无法点歌';
+        if (ignore) {
+            let memInf = await api.getGroupMemberInfo(g_gc, uin);
+            if (memInf.data == null) return '不在群里无法点歌';
+        }
         let user = getUser(uin);
-        if (user.num >= personalMax) return `每时段内每人仅可点${personalMax}首歌哦！`;
+        if (user.num >= personalMax) return `😗每时段内每人仅可点${personalMax}首歌哦！`;
         user.num += 1;
 
         // add the music to the list
-        if (musicLists.length > maxAmount) return '当前时段点歌数量已达上限';
+        if (musicLists.length > maxAmount) return '🥲当前时段点歌数量已达上限';
 
         let title = await getSongTitle(music.id, music.type);
         if (title == "") throw ("empty title");
@@ -124,7 +121,7 @@ function handle() {
             fs.writeFileSync("./cache/usersLists.json", JSON.stringify(usersLists));
             realease("[3]no error", 0)
         }, (err, ret) => {}, null)
-        api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}]点歌成功，No.${id}:【${music.title}】`);
+        if (ignore) api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}] 🎶点歌成功，No.${id}:【${music.title}】`);
         return `🎶点歌成功，点歌序号：${id}`;
     }
 

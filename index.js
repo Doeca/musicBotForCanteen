@@ -5,7 +5,7 @@ const url = "ws://127.0.0.1:23663/"
 const handle = new(require('./handle'))()
 const cron = require('node-cron')
 const fs = require('fs')
-const g_gc = 191894480;
+const g_gc = 571777125;
 
 // initialize server
 let frontServer = new server(handle)
@@ -56,9 +56,17 @@ ws.on('connect', (client) => {
                     if (inf.group_id != g_gc) return;
                     let res = handle.interaction(inf.sender.user_id, inf.message);
                     if (res != '') api.sendGroupMsg(g_gc, res);
-                case 'private':
-                    handle.administrator(inf.sender.user_id, inf.message)
 
+                    ret = handle.orderMusic(inf.sender.user_id, inf.message);
+                    ret.then(msg => {
+                        if (msg != '') api.sendPrivateMsg(inf.sender.user_id, msg);
+                    }).catch((err) => {
+                        let msg = `Error caught\nerr:${err}`;
+                        api.sendPrivateMsg(1124468334, msg);
+                        api.sendGroupMsg(g_gc, '[CQ:at,qq=' + inf.sender.user_id + ']🤒点歌失败，请稍后再试');
+                    });
+
+                case 'private':
                     let ret = handle.orderMusic(inf.sender.user_id, inf.message);
                     ret.then(msg => {
                         if (msg != '') api.sendPrivateMsg(inf.sender.user_id, msg);
@@ -96,17 +104,17 @@ ws.on('connect', (client) => {
 ws.connect(url)
 
 
-cron.schedule("1 0 11,17 * * *", () => {
+cron.schedule("1 30 11,17 * * *", () => {
     try {
         handle.switchType(true);
         fs.rmSync('./cache/musicLists.json');
         fs.rmSync('./cache/usersLists.json');
-        api.sendGroupMsg(g_gc, "🥰开始点歌啦，私聊分享歌曲给我即可点歌！");
+        api.sendGroupMsg(g_gc, "🥰开始点歌啦，分享歌曲到群中即可点歌！");
     } catch (e) {
         console.log("starting order", e)
     }
 
 })
-cron.schedule("1 0 13,19 * * *", () => {
+cron.schedule("1 30 13,19 * * *", () => {
     handle.switchType(false);
 })
