@@ -14,7 +14,6 @@ const fs = require('fs')
 const key = fs.readFileSync("./cache/.key")
 
 
-
 function handle() {
     var canOrder = false,
         maxAmount = 50,
@@ -146,7 +145,7 @@ function handle() {
         return `🎶点歌成功，点歌序号：${id}`;
     }
 
-    this.getMusicList = (erase = false, onlyNew = true, key) => {
+    this.getMusicList = (erase = false, onlyNew = true, pk) => {
         //获取所有歌 或 获取没有播放的歌
         //console.log(musicLists);
         if (pk != key) return;
