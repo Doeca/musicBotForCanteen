@@ -33,7 +33,7 @@ function server(p_handle) {
             res.send(handle.reconnectws())
         })
 
-        app.get("/getOperation", (req, res) => {
+        app.get("/getOperations", (req, res) => {
             res.send(handle.getOperations())
         })
     }

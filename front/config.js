@@ -20,12 +20,15 @@ docute.init({
 function player() {
     return function(context) {
         context.event.on('landing:updated', function() {
-            console.log('landing:updated');
             aplayer1();
             loadPlayer();
             setInterval((handler) => {
                 loadPlayer()
                 console.log('fetch new songs');
+            }, 10000);
+            setInterval((handler) => {
+                operatePlayer()
+                console.log('fetch new operations');
             }, 10000);
         });
     };
@@ -91,6 +94,7 @@ function loadPlayer(onlyNew) {
                         "lrc": inf[0].lrc,
                         "id": val.id
                     })
+
                 });
                 jsonList.push(jsonPromise);
             });
@@ -118,7 +122,8 @@ function loadPlayer(onlyNew) {
 
 //待测试
 function operatePlayer() {
-    fetch(apiUrl + "getOperation").then((res) => {
+    fetch(apiUrl + "getOperations").then((res) => {
+        console.log("json:", res.json())
         res.json().then((arr) => {
             if (arr == null) return;
             if (arr.length != 0) {
@@ -126,6 +131,8 @@ function operatePlayer() {
                     if (v.type == 'toggle') window.ap1.toggle();
                     if (v.type == 'next') window.ap1.skipForward();
                     if (v.type == 'last') window.ap1.skipBack();
+                    if (v.type == 'play') window.ap1.play();
+                    if (v.type == 'pause') window.ap1.pause();
                     if (v.type == 'switch') window.ap1.list.switch(v.para - 1);
                 })
             }

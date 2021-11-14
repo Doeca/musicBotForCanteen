@@ -44,7 +44,7 @@ function handle() {
         //网易云判断
         for (let i = 0; i < m163.length; i++) {
             if ((res = m163[i].exec(msg)) !== null) {
-                console.log(res);
+
                 m163[i].lastIndex = 0;
                 return { type: 1, id: res[1].toString(), title: "" }
             }
@@ -52,7 +52,7 @@ function handle() {
         //QQ音乐判断
         for (let i = 0; i < mqq.length; i++) {
             if ((res = mqq[i].exec(msg)) !== null) {
-                console.log(res);
+
                 mqq[i].lastIndex = 0;
                 return { type: 2, id: res[1].toString(), title: "" }
             }
@@ -186,7 +186,7 @@ function handle() {
         lock.acquire("operations", (done) => {
             ret = JSON.stringify(operations);
             operations.length = 0;
-            done("no error", 0);
+            done("[operations]no error", 0);
         }, (err, ret) => {}, null);
         return ret;
     }
@@ -204,36 +204,38 @@ function handle() {
                     } catch (e) {
                         console.log(e);
                     }
-                    return 'Success';
+                    return '♻️点歌状态切换为开启';
                 case `/shut_order`:
                     this.switchType(false);
-                    return 'Success';
-                case `/test_order`:
-                    try {
-                        this.switchType(true);
-                        api.sendGroupMsg(g_gc, "[CQ:at,qq=all]🥰开始点歌啦，分享歌曲到群中即可点歌！\n（支持音源：网易云音乐、QQ音乐，暂不支持会员歌曲）");
-                        fs.rmSync('./cache/musicLists.json');
-                        fs.rmSync('./cache/usersLists.json');
-                    } catch (e) {
-                        console.log("starting order", e)
-                    }
-                    break;
+                    return '🆗点歌状态切换为关闭';
+                case `/play`:
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "play" });
+                        done("[play]no error", 0);
+                    }, (err, ret) => {}, null);
+                    return '✅播放歌曲';
+                case `/pause`:
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "pause" });
+                        done("[pause]no error", 0);
+                    }, (err, ret) => {}, null);
+                    return '✅停止播放';
                 case `/toggle`:
                     lock.acquire("operations", (done) => {
                         operations.push({ type: "toggle" });
-                        done("no error", 0);
+                        done("[toggle]no error", 0);
                     }, (err, ret) => {}, null);
                     return '✅切换播放状态';
                 case `/next`:
                     lock.acquire("operations", (done) => {
                         operations.push({ type: "next" });
-                        done("no error", 0);
+                        done("[next]no error", 0);
                     }, (err, ret) => {}, null);
                     return '✅切换至下一首歌';
                 case `/last`:
                     lock.acquire("operations", (done) => {
                         operations.push({ type: "last" });
-                        done("no error", 0);
+                        done("[last]no error", 0);
                     }, (err, ret) => {}, null);
 
                     return '✅切换至上一首歌';
@@ -242,7 +244,7 @@ function handle() {
             }
 
             if (msg.indexOf("/switch") == 0) {
-                let id = msg.replace("/switch");
+                let id = msg.replace("/switch", "");
                 lock.acquire("operations", (done) => {
                     operations.push({ type: "switch", para: id });
                     done("no error", 0);

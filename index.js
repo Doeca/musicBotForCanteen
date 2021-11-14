@@ -11,24 +11,20 @@ const g_gc = 191894480;
 let frontServer = new server(handle);
 frontServer.start();
 // Basic connection
-console.log("Connecting")
 let ws = new websocketClient()
-let api; //全局应用一个api地址
+let api;
 
 function reconnect() {
     ws.connect(url);
     return "Over";
 }
-
-
-
+console.log(`Start connecting with group_id:${g_gc}`)
 ws.on('connect', (client) => {
-    // initialize api module
+    // initialize api,handle module
     api = new miraiApi(client);
     api.setResCreator((id) => {
         return new Promise((resolve, rej) => {
             setTimeout(() => rej('timeout'), 1000);
-
             client.on('message', (msg) => {
                 let val = JSON.parse(msg.utf8Data);
                 if (val.echo == id) {
@@ -37,17 +33,13 @@ ws.on('connect', (client) => {
             })
         })
     })
-
     handle.setFuncAddress(reconnect, api, g_gc); //将Class句柄传入处理module
 
     console.log("WebSocket Client Connected");
     client.on('message', (msg) => {
         let inf = JSON.parse(msg.utf8Data);
-
-
         if (inf.post_type == 'meta_event')
             return;
-
 
         // Router Part
         if (inf.post_type == 'message') {
