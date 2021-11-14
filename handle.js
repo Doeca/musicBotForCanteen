@@ -174,12 +174,14 @@ function handle() {
     }
 
     this.notifyError = (uin, id) => {
-        api.sendPrivateMsg(uin, `😥抱歉，您点的歌曲【` + getMusic(id).music.title + `】加载失败，可稍后重新点歌`);
+        api.sendPivateMsg(uin, `😥抱歉，您点的歌曲【` + getMusic(id).music.title + `】加载失败，可稍后重新点歌`);
+        api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}] 😥抱歉，您点的歌曲【` + getMusic(id).music.title + `】加载失败，可稍后重新点歌`);
         getUser(uin).num -= 1;
         return '200';
     }
 
     this.interaction = (uin, msg) => {
+        //与群里的交互
         if (uin == 1124468334) {
             switch (msg) {
                 case `/st_order`:
@@ -195,6 +197,16 @@ function handle() {
                 case `/shut_order`:
                     this.switchType(false);
                     return 'Success';
+                case `/test_order`:
+                    try {
+                        handle.switchType(true);
+                        api.sendGroupMsg(g_gc, "[CQ:at,qq=all]🥰开始点歌啦，分享歌曲到群中即可点歌！\n（支持音源：网易云音乐、QQ音乐，暂不支持会员歌曲）");
+                        fs.rmSync('./cache/musicLists.json');
+                        fs.rmSync('./cache/usersLists.json');
+                    } catch (e) {
+                        console.log("starting order", e)
+                    }
+                    break;
                 default:
 
             }
@@ -203,7 +215,7 @@ function handle() {
         switch (msg) {
             case '当前歌曲':
                 if (currentSong == 0) return '👁‍🗨当前没有在播放歌曲';
-                return "当前歌曲【" + getMusic(currentSong).music.title + "】";
+                return "🅿️当前歌曲【" + getMusic(currentSong).music.title + "】";
             case '歌曲列表':
                 if (musicLists.length == 0) return '😗当前歌曲列表为🈳️';
                 let res = '🗒歌曲列表（🅿️正在播放）：';

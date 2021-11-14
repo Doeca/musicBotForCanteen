@@ -99,6 +99,11 @@ ws.on('connect', (client) => {
                 case 'friend':
                     api.setFriendAddRequest(inf.flag, true, '')
                     break;
+                case `group`:
+                    if (inf.group_id == g_gc) {
+                        api.setGroupAddRequest(inf.flag, 'add', true, '');
+                    }
+                    break;
                 default:
                     console.log(`unrecognized request : ${inf.message_type}`)
             }
@@ -111,22 +116,7 @@ ws.on('connect', (client) => {
 ws.connect(url)
 
 
-cron.schedule("1 30 11,17 * * *", () => {
-    try {
-        handle.switchType(true);
-        fs.rmSync('./cache/musicLists.json');
-        fs.rmSync('./cache/usersLists.json');
-        api.sendGroupMsg(g_gc, "🥰开始点歌啦，分享歌曲链接到群中即可点歌！");
-    } catch (e) {
-        console.log("starting order", e)
-    }
-
-})
-cron.schedule("1 30 13,19 * * *", () => {
-    handle.switchType(false);
-})
-
-cron.schedule("1 10 16 * * *", () => {
+cron.schedule("0 30 11,17 * * *", () => {
     try {
         handle.switchType(true);
         api.sendGroupMsg(g_gc, "[CQ:at,qq=all]🥰开始点歌啦，分享歌曲到群中即可点歌！\n（支持音源：网易云音乐、QQ音乐，暂不支持会员歌曲）");
@@ -136,4 +126,7 @@ cron.schedule("1 10 16 * * *", () => {
         console.log("starting order", e)
     }
 
+})
+cron.schedule("0 30 13,19 * * *", () => {
+    handle.switchType(false);
 })

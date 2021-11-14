@@ -41,6 +41,18 @@ function miraiApi(client) {
         }))
     }
 
+    this.setGroupAddRequest = (flag, subtype, approve = false, reason) => {
+        cl.send(json2str({
+            "action": "set_group_add_request",
+            "params": {
+                "flag": flag,
+                'sub_type': subtype,
+                "approve": approve,
+                "reason": reason
+            }
+        }))
+    }
+
     this.getGroupMemberInfo = (gc, uin) => {
         let id = Math.random();
         cl.send(json2str({

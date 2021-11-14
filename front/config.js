@@ -52,9 +52,7 @@ function aplayer1() {
 }
 
 function postInf(path, type, msg) {
-    fetch(apiUrl + path, {
-        mode: "no-cors"
-    })
+    fetch(apiUrl + path)
 }
 
 
@@ -64,21 +62,19 @@ function loadPlayer(onlyNew) {
             alert('获取歌曲列表失败，请重载网页！');
             return;
         }
-
         let arr = res.json();
         return arr;
     }).then(arr => {
         if (arr == undefined) return;
         let musicList = Array();
-        let promiseList = Array();
+        let promiseList = Array(); // for sort
         arr.forEach((val, index) => {
             let url = "https://api.i-meto.com/meting/api?server=" + (val.music.type == 1 ? 'netease' : "tencent") + "&type=song&id=" + val.music.id + "&r=" + Math.random();
-            promiseList.push(fetch(url, {
+            let promise = fetch(url, {
                     mode: "cors"
                 })
                 .then(resp => {
                     resp.json().then(inf => {
-
                         if (inf.length <= 0) {
                             postInf(`loadError?id=${val.id}&uin=${val.uin}`, "error", "song can't load");
                             return;
@@ -93,7 +89,8 @@ function loadPlayer(onlyNew) {
                             "id": val.id
                         })
                     });
-                }));
+                });
+            promiseList.push(promise);
         });
 
         Promise.all(promiseList).then(arg => {
