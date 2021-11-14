@@ -22,6 +22,7 @@ function handle() {
     var currentSong = 0;
     let musicLists = Array()
     let usersLists = Array()
+    let operations = Array()
 
 
     async function getSongTitle(id, type) {
@@ -180,9 +181,19 @@ function handle() {
         return '200';
     }
 
+    this.getOperations() = () => {
+        let ret;
+        lock.acquire("operations", (done) => {
+            ret = JSON.stringify(operations);
+            operations.length = 0;
+            done("no error", 0);
+        }, (err, ret) => {}, null);
+        return ret;
+    }
+
     this.interaction = (uin, msg) => {
         //与群里的交互
-        if (uin == 1124468334) {
+        if (uin == 1124468334 || uin == 710813324) {
             switch (msg) {
                 case `/st_order`:
                     if (canOrder) return 'Fail';
@@ -207,8 +218,36 @@ function handle() {
                         console.log("starting order", e)
                     }
                     break;
+                case `/toggle`:
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "toggle" });
+                        done("no error", 0);
+                    }, (err, ret) => {}, null);
+                    return '✅切换播放状态';
+                case `/next`:
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "next" });
+                        done("no error", 0);
+                    }, (err, ret) => {}, null);
+                    return '✅切换至下一首歌';
+                case `/last`:
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "last" });
+                        done("no error", 0);
+                    }, (err, ret) => {}, null);
+
+                    return '✅切换至上一首歌';
                 default:
 
+            }
+
+            if (msg.indexOf("/switch") == 0) {
+                let id = msg.replace("/switch");
+                lock.acquire("operations", (done) => {
+                    operations.push({ type: "switch", para: id });
+                    done("no error", 0);
+                }, (err, ret) => {}, null);
+                return '✅切换至第' + id + "首歌";
             }
         }
 

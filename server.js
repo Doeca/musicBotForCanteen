@@ -32,6 +32,10 @@ function server(p_handle) {
         app.get("/reconnect", (req, res) => {
             res.send(handle.reconnectws())
         })
+
+        app.get("/getOperation", (req, res) => {
+            res.send(handle.getOperations())
+        })
     }
 
     this.stop = function() {

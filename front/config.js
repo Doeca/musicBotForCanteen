@@ -25,8 +25,13 @@ function player() {
             loadPlayer();
             setInterval((handler) => {
                 loadPlayer()
-                console.log(1);
+                console.log('fetch new songs');
             }, 10000);
+
+            setInterval((handler) => {
+                operatePlayer()
+                console.log('fetch new operations');
+            }, 1000);
         });
     };
 }
@@ -91,6 +96,7 @@ function loadPlayer(onlyNew) {
                     });
                 });
             promiseList.push(promise);
+            console.log("now:", promise, val);
         });
 
         Promise.all(promiseList).then(arg => {
@@ -101,5 +107,21 @@ function loadPlayer(onlyNew) {
             window.ap1.list.show();
         })
 
+    })
+}
+
+function operatePlayer() {
+    fetch(apiUrl + "getOperation").then((res) => {
+        res.json().then((arr) => {
+            if (arr == null) return;
+            if (arr.length != 0) {
+                arr.forEach((v, i) => {
+                    if (v.type == 'toggle') window.ap1.toggle();
+                    if (v.type == 'next') window.ap1.skipForward();
+                    if (v.type == 'last') window.ap1.skipBack();
+                    if (v.type == 'switch') window.ap1.list.switch(v.para - 1);
+                })
+            }
+        })
     })
 }
