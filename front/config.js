@@ -1,4 +1,7 @@
 let apiUrl = 'https://music.doeca.cc/';
+let str = window.location.href;
+let key = str.substr(str.indexOf("?") + 1, 12);
+
 
 docute.init({
     landing: 'landing.html',
@@ -15,6 +18,7 @@ docute.init({
     ]
 });
 
+if (window.location.href.indexOf(""))
 
 
 function player() {
@@ -29,7 +33,7 @@ function player() {
             setInterval((handler) => {
                 operatePlayer()
                 console.log('fetch new operations');
-            }, 10000);
+            }, 1000);
         });
     };
 }
@@ -60,7 +64,7 @@ function postInf(path, type, msg) {
 
 
 function loadPlayer(onlyNew) {
-    fetch(apiUrl + "getMusicList?erase=0&onlyNew=" + (onlyNew === 0 ? 0 : 1)).then((res) => {
+    fetch(apiUrl + "getMusicList?key=" + key + "erase=0&onlyNew=" + (onlyNew === 0 ? 0 : 1)).then((res) => {
         if (res.status != 200) {
             alert('获取歌曲列表失败，请重载网页！');
             return;
@@ -122,8 +126,7 @@ function loadPlayer(onlyNew) {
 
 //待测试
 function operatePlayer() {
-    fetch(apiUrl + "getOperations").then((res) => {
-        console.log("json:", res.json())
+    fetch(apiUrl + "getOperations?key=" + key).then((res) => {
         res.json().then((arr) => {
             if (arr == null) return;
             if (arr.length != 0) {
@@ -133,6 +136,7 @@ function operatePlayer() {
                     if (v.type == 'last') window.ap1.skipBack();
                     if (v.type == 'play') window.ap1.play();
                     if (v.type == 'pause') window.ap1.pause();
+                    if (v.type == 'load') loadPlayer();
                     if (v.type == 'switch') window.ap1.list.switch(v.para - 1);
                 })
             }

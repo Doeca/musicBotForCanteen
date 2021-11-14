@@ -18,24 +18,22 @@ function server(p_handle) {
         })
 
         app.get("/getMusicList", (req, res) => {
-            res.send(handle.getMusicList(req.query.erase == 1, req.query.onlyNew == 1)) //获取歌曲列表
+            res.send(handle.getMusicList(req.query.erase == 1, req.query.onlyNew == 1, req.query.key)) //获取歌曲列表
         })
-
+        app.get("/getOperations", (req, res) => {
+            res.send(handle.getOperations(req.query.key))
+        })
         app.get("/setMusicStatus", (req, res) => {
             res.send(handle.setMusicStatus(req.query.id)) //设置歌曲为播放完的
         })
-
         app.get("/loadError", (req, res) => {
             res.send(handle.notifyError(req.query.uin, req.query.id));
         })
-
         app.get("/reconnect", (req, res) => {
             res.send(handle.reconnectws())
         })
 
-        app.get("/getOperations", (req, res) => {
-            res.send(handle.getOperations())
-        })
+
     }
 
     this.stop = function() {

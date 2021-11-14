@@ -6,10 +6,12 @@ const m163 = [
 const mqq = [
     /https:\/\/i.y.qq.com\/n2\/m\/musiclite\/playsong\/index.html\?app_type=.*songmid=([0-9a-zA-z]{1,})/g,
     /http:\/\/c6.y.qq.com\/rsc\/fcgi-bin\/fcg_pyq_play\.fcg\?songid.*songmid=([0-9a-zA-Z]{1,})/g,
+    /https:\/\/i.y.qq.com\/v8\/playsong.html\?platform.*songmid=([a-zA-Z0-9]{1,})/g
 ]
 const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
+const key = ''
 
 
 
@@ -134,20 +136,21 @@ function handle() {
         lock.acquire("music", (realease) => {
             id = musicLists.length + 1;
             musicLists.push({ 'id': id, 'music': music, 'uin': uin, 'fetched': false, 'played': false });
-            fs.writeFileSync("./cache/musicLists.json", JSON.stringify(musicLists));
+            try { fs.writeFileSync("./cache/musicLists.json", JSON.stringify(musicLists)); } catch (e) {}
             realease("[2]no error", 0)
         }, (err, ret) => {}, null)
         lock.acquire("user", (realease) => {
-            fs.writeFileSync("./cache/usersLists.json", JSON.stringify(usersLists));
+            try { fs.writeFileSync("./cache/usersLists.json", JSON.stringify(usersLists)); } catch (e) {}
             realease("[3]no error", 0)
         }, (err, ret) => {}, null)
         if (!ignore) api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}] 🎶点歌成功，No.${id}:【${music.title}】`);
         return `🎶点歌成功，点歌序号：${id}`;
     }
 
-    this.getMusicList = (erase = false, onlyNew = true) => {
+    this.getMusicList = (erase = false, onlyNew = true, key) => {
         //获取所有歌 或 获取没有播放的歌
         //console.log(musicLists);
+        if (pk != key) return;
         if (onlyNew) {
             let arr = Array();
             musicLists.forEach((val, index) => {
@@ -181,7 +184,8 @@ function handle() {
         return '200';
     }
 
-    this.getOperations = () => {
+    this.getOperations = (pk) => {
+        if (pk != key) return;
         let ret;
         lock.acquire("operations", (done) => {
             ret = JSON.stringify(operations);
@@ -208,6 +212,12 @@ function handle() {
                 case `/shut_order`:
                     this.switchType(false);
                     return '🆗点歌状态切换为关闭';
+                case `/load`:
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "load" });
+                        done("[load]]no error", 0);
+                    }, (err, ret) => {}, null);
+                    return '✅加载历史歌曲';
                 case `/play`:
                     lock.acquire("operations", (done) => {
                         operations.push({ type: "play" });
