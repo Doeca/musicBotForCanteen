@@ -5,27 +5,26 @@ const url = "ws://127.0.0.1:23663/"
 const handle = new(require('./handle'))()
 const cron = require('node-cron')
 const fs = require('fs')
-const g_gc = 571777125;
+const g_gc = 191894480;
 
 // initialize server
-let frontServer = new server(handle)
-frontServer.start()
-    // Basic connection
+let frontServer = new server(handle);
+frontServer.start();
+// Basic connection
 console.log("Connecting")
 let ws = new websocketClient()
-
+let api; //全局应用一个api地址
 
 function reconnect() {
     ws.connect(url);
     return "Over";
 }
 
-handle.setReconnectAddress(reconnect);
+
 
 ws.on('connect', (client) => {
     // initialize api module
-    let api = new miraiApi(client);
-
+    api = new miraiApi(client);
     api.setResCreator((id) => {
         return new Promise((resolve, rej) => {
             setTimeout(() => rej('timeout'), 1000);
@@ -39,41 +38,48 @@ ws.on('connect', (client) => {
         })
     })
 
-    handle.setApiAddress(api);
-    console.log("WebSocket Client Connected");
+    handle.setFuncAddress(reconnect, api, g_gc); //将Class句柄传入处理module
 
+    console.log("WebSocket Client Connected");
     client.on('message', (msg) => {
         let inf = JSON.parse(msg.utf8Data);
+
+
         if (inf.post_type == 'meta_event')
             return;
-        console.log(msg.utf8Data)
+
 
         // Router Part
         if (inf.post_type == 'message') {
-
+            inf.message = inf.message.replace(/\\\//g, "/");
+            let ret;
             switch (inf.message_type) {
                 case 'group':
                     if (inf.group_id != g_gc) return;
                     let res = handle.interaction(inf.sender.user_id, inf.message);
-                    if (res != '') api.sendGroupMsg(g_gc, res);
+                    if (res != '') {
+                        api.sendGroupMsg(g_gc, res);
+                    }
 
-                    ret = handle.orderMusic(inf.sender.user_id, inf.message);
+                    ret = handle.orderMusic(inf.sender.user_id, inf.message, true);
                     ret.then(msg => {
-                        if (msg != '') api.sendPrivateMsg(inf.sender.user_id, msg);
+                        if (msg != '') {
+                            api.sendGroupMsg(g_gc, '[CQ:at,qq=' + inf.sender.user_id + '] ' + msg);
+                        }
                     }).catch((err) => {
                         let msg = `Error caught\nerr:${err}`;
                         api.sendPrivateMsg(1124468334, msg);
-                        api.sendGroupMsg(g_gc, '[CQ:at,qq=' + inf.sender.user_id + ']🤒点歌失败，请稍后再试');
+                        api.sendGroupMsg(g_gc, '[CQ:at,qq=' + inf.sender.user_id + ']🤒点歌失败，请稍后再试\n失败原因：' + err);
                     });
-
+                    break;
                 case 'private':
-                    let ret = handle.orderMusic(inf.sender.user_id, inf.message);
+                    ret = handle.orderMusic(inf.sender.user_id, inf.message, false);
                     ret.then(msg => {
                         if (msg != '') api.sendPrivateMsg(inf.sender.user_id, msg);
                     }).catch((err) => {
                         let msg = `Error caught\nerr:${err}`;
                         api.sendPrivateMsg(1124468334, msg);
-                        api.sendPrivateMsg(inf.sender.user_id, '🤒点歌失败，请稍后再试');
+                        api.sendPrivateMsg(inf.sender.user_id, '🤒点歌失败，请稍后再试\n失败原因：' + err);
                     });
 
                     if (inf.message.substr(0, 14) == 'heart_checking') {
@@ -88,6 +94,7 @@ ws.on('connect', (client) => {
 
         //处理加好友请求
         if (inf.post_type == "request") {
+            console.log(inf);
             switch (inf.request_type) {
                 case 'friend':
                     api.setFriendAddRequest(inf.flag, true, '')
@@ -109,7 +116,7 @@ cron.schedule("1 30 11,17 * * *", () => {
         handle.switchType(true);
         fs.rmSync('./cache/musicLists.json');
         fs.rmSync('./cache/usersLists.json');
-        api.sendGroupMsg(g_gc, "🥰开始点歌啦，分享歌曲到群中即可点歌！");
+        api.sendGroupMsg(g_gc, "🥰开始点歌啦，分享歌曲链接到群中即可点歌！");
     } catch (e) {
         console.log("starting order", e)
     }
@@ -117,4 +124,16 @@ cron.schedule("1 30 11,17 * * *", () => {
 })
 cron.schedule("1 30 13,19 * * *", () => {
     handle.switchType(false);
+})
+
+cron.schedule("1 9 15 * * *", () => {
+    try {
+        handle.switchType(true);
+        api.sendGroupMsg(g_gc, "🥰开始点歌啦，分享歌曲链接到群中即可点歌！");
+        fs.rmSync('./cache/musicLists.json');
+        fs.rmSync('./cache/usersLists.json');
+    } catch (e) {
+        console.log("starting order", e)
+    }
+
 })

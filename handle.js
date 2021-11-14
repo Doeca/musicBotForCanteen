@@ -1,9 +1,15 @@
-const m163 = new RegExp('http(s|):\/\/.*music.163.com\/.*id=([0-9]{1,})')
-const mqq = new RegExp('http(s|):\/\/.*qq.com\/v.*songmid=([0-9a-zA-Z]{1,})')
+const m163 = [
+    /https:\/\/y\.music\.163\.com\/m\/song\?id=([0-9]{1,10})/g,
+    /http:\/\/music.163.com\/song\?id=([0-9]{1,})/g
+]
+
+const mqq = [
+    /https:\/\/i.y.qq.com\/n2\/m\/musiclite\/playsong\/index.html\?app_type=.*songmid=([0-9a-zA-z]{1,})/g,
+    /http:\/\/c6.y.qq.com\/rsc\/fcgi-bin\/fcg_pyq_play\.fcg\?songid.*songmid=([0-9a-zA-Z]{1,})/g,
+]
 const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
-const g_gc = 571777125;
 
 
 
@@ -12,13 +18,14 @@ function handle() {
     var canOrder = false,
         maxAmount = 50,
         personalMax = 3,
-        api, reconnect;
+        g_gc, api, reconnect;
     var currentSong = 0;
-    const musicLists = Array()
-    const usersLists = Array()
+    let musicLists = Array()
+    let usersLists = Array()
 
 
     async function getSongTitle(id, type) {
+
         let url = "https://api.i-meto.com/meting/api?server=" + (type == 1 ? 'netease' : "tencent") + "&type=song&id=" + id + "&r=" + Math.random();
         let val;
         await axios.get(url).then(res => {
@@ -26,17 +33,32 @@ function handle() {
             //console.log("res", res);
             val = res.data
         });
+        console.log("getSongTitle:", id, type, val);
         if (val.length == 0) return "";
         else return val[0].title + " - " + val[0].author;
     }
 
     function matchMsg(msg) {
-        if (m163.test(msg)) {
-            let res = m163.exec(msg)
-            return { type: 1, id: res[2].toString(), title: "" }
-        } else if (mqq.test(msg)) {
-            let res = mqq.exec(msg)
-            return { type: 2, id: res[2].toString(), title: "" }
+        let res;
+        //网易云判断
+        for (let i = 0; i < m163.length; i++) {
+            if ((res = m163[i].exec(msg)) !== null) {
+                console.log(res);
+                m163[i].lastIndex = 0;
+                return { type: 1, id: res[1].toString(), title: "" }
+            }
+        }
+        //QQ音乐判断
+        for (let i = 0; i < mqq.length; i++) {
+            if ((res = mqq[i].exec(msg)) !== null) {
+                console.log(res);
+                mqq[i].lastIndex = 0;
+                return { type: 2, id: res[1].toString(), title: "" }
+            }
+        }
+        //暂不支持的平台
+        if (msg.indexOf("[CQ:json,data=") != -1 && msg.indexOf("音乐") != -1) {
+            return 1; //告知不支持的平台信息而不是不响应
         } else {
             return null;
         }
@@ -61,20 +83,19 @@ function handle() {
         return musicLists[i];
     }
 
-    this.setReconnectAddress = (func) => {
-        reconnect = func;
+    this.setFuncAddress = (fun1, fun2, gc) => {
+        reconnect = fun1;
+        api = fun2;
+        g_gc = gc;
     }
 
     this.reconnectws = () => {
         return reconnect();
     }
 
-    this.setApiAddress = (p_api) => {
-        api = p_api;
-    }
-
     this.switchType = (whether) => {
         canOrder = whether;
+        console.log("[Status] Type switched to be" + canOrder);
         if (canOrder) {
             currentSong = 0;
             musicLists.length = 0;
@@ -91,9 +112,9 @@ function handle() {
         if (!canOrder) {
             return '当前时段不可点歌哦😯';
         } else if (musicLists.length > maxAmount) {
-            return '当前时段点歌数量已达上限🧎‍♂️';
+            return '当前时段点歌数量已达上限🥲';
         }
-
+        if (music === 1) return '🥲暂时不支持该平台';
         // judge if the user is in the offical group and if the user order the excessive music.
         if (ignore) {
             let memInf = await api.getGroupMemberInfo(g_gc, uin);
@@ -104,10 +125,8 @@ function handle() {
         user.num += 1;
 
         // add the music to the list
-        if (musicLists.length > maxAmount) return '🥲当前时段点歌数量已达上限';
-
         let title = await getSongTitle(music.id, music.type);
-        if (title == "") throw ("empty title");
+        if (title == "") throw ("未找到该歌曲信息（可能是VIP歌曲）");
 
         music.title = title;
         let id;
@@ -121,7 +140,7 @@ function handle() {
             fs.writeFileSync("./cache/usersLists.json", JSON.stringify(usersLists));
             realease("[3]no error", 0)
         }, (err, ret) => {}, null)
-        if (ignore) api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}] 🎶点歌成功，No.${id}:【${music.title}】`);
+        if (!ignore) api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}] 🎶点歌成功，No.${id}:【${music.title}】`);
         return `🎶点歌成功，点歌序号：${id}`;
     }
 
@@ -165,7 +184,6 @@ function handle() {
             switch (msg) {
                 case `/st_order`:
                     if (canOrder) return 'Fail';
-                    // cause no one can 
                     this.switchType(true);
                     try {
                         musicLists = JSON.parse(fs.readFileSync("./cache/musicLists.json"));
