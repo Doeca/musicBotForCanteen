@@ -5,7 +5,7 @@ const url = "ws://127.0.0.1:23663/"
 const handle = new(require('./handle'))()
 const cron = require('node-cron')
 const fs = require('fs')
-const g_gc = 191894480;
+const g_gc = fs.readFileSync('./cache/.gc');
 
 // initialize server
 let frontServer = new server(handle);

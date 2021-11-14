@@ -64,7 +64,7 @@ function postInf(path, type, msg) {
 
 
 function loadPlayer(onlyNew) {
-    fetch(apiUrl + "getMusicList?key=" + key + "erase=0&onlyNew=" + (onlyNew === 0 ? 0 : 1)).then((res) => {
+    fetch(apiUrl + "getMusicList?key=" + key + "&erase=0&onlyNew=" + (onlyNew === 0 ? 0 : 1)).then((res) => {
         if (res.status != 200) {
             alert('获取歌曲列表失败，请重载网页！');
             return;
