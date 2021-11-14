@@ -11,8 +11,7 @@ const mqq = [
 const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
-const key = ''
-
+const key = fs.readFileSync("./cache/.key")
 
 
 
