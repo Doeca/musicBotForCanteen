@@ -126,10 +126,10 @@ cron.schedule("1 30 13,19 * * *", () => {
     handle.switchType(false);
 })
 
-cron.schedule("1 9 15 * * *", () => {
+cron.schedule("1 5 16 * * *", () => {
     try {
         handle.switchType(true);
-        api.sendGroupMsg(g_gc, "🥰开始点歌啦，分享歌曲链接到群中即可点歌！");
+        api.sendGroupMsg(g_gc, "[CQ:at,qq=all]🥰开始点歌啦，分享歌曲到群中即可点歌！\n（支持音源：网易云音乐、QQ音乐，暂不支持会员歌曲）");
         fs.rmSync('./cache/musicLists.json');
         fs.rmSync('./cache/usersLists.json');
     } catch (e) {

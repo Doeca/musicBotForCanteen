@@ -214,8 +214,8 @@ function handle() {
                         else if (val.id == currentSong) res += '🅿️';
                         else res += '💮'
                         res += `No.${val.id} ${val.music.title}`;
-                        realease("[4]no error", 0)
                     });
+                    realease("[4]no error", 0)
                 }, (err, ret) => {}, null)
                 return res;
         }
