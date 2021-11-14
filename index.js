@@ -126,7 +126,7 @@ cron.schedule("1 30 13,19 * * *", () => {
     handle.switchType(false);
 })
 
-cron.schedule("1 5 16 * * *", () => {
+cron.schedule("1 10 16 * * *", () => {
     try {
         handle.switchType(true);
         api.sendGroupMsg(g_gc, "[CQ:at,qq=all]🥰开始点歌啦，分享歌曲到群中即可点歌！\n（支持音源：网易云音乐、QQ音乐，暂不支持会员歌曲）");
