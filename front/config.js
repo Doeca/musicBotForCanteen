@@ -27,11 +27,6 @@ function player() {
                 loadPlayer()
                 console.log('fetch new songs');
             }, 10000);
-
-            setInterval((handler) => {
-                operatePlayer()
-                console.log('fetch new operations');
-            }, 1000);
         });
     };
 }
@@ -72,44 +67,56 @@ function loadPlayer(onlyNew) {
     }).then(arr => {
         if (arr == undefined) return;
         let musicList = Array();
-        let promiseList = Array(); // for sort
+        let fetchList = Array(); // for sort
+        let jsonList = Array();
         arr.forEach((val, index) => {
             let url = "https://api.i-meto.com/meting/api?server=" + (val.music.type == 1 ? 'netease' : "tencent") + "&type=song&id=" + val.music.id + "&r=" + Math.random();
-            let promise = fetch(url, {
-                    mode: "cors"
-                })
-                .then(resp => {
-                    resp.json().then(inf => {
-                        if (inf.length <= 0) {
-                            postInf(`loadError?id=${val.id}&uin=${val.uin}`, "error", "song can't load");
-                            return;
-                        }
+            let fetchPromise = fetch(url, {
+                mode: "cors"
+            });
+            fetchPromise.then(resp => {
+                let jsonPromise = resp.json();
+                jsonPromise.then(inf => {
+                    //console.log(val.id, inf);
+                    if (inf.length <= 0) {
+                        postInf(`loadError?id=${val.id}&uin=${val.uin}`, "error", "song can't load");
+                        return;
+                    }
 
-                        musicList.push({
-                            "name": inf[0].title,
-                            "artist": inf[0].author,
-                            "url": inf[0].url,
-                            "cover": inf[0].pic,
-                            "lrc": inf[0].lrc,
-                            "id": val.id
-                        })
-                    });
+                    musicList.push({
+                        "name": inf[0].title,
+                        "artist": inf[0].author,
+                        "url": inf[0].url,
+                        "cover": inf[0].pic,
+                        "lrc": inf[0].lrc,
+                        "id": val.id
+                    })
                 });
-            promiseList.push(promise);
-            console.log("now:", promise, val);
+                jsonList.push(jsonPromise);
+            });
+            fetchList.push(fetchPromise);
         });
 
-        Promise.all(promiseList).then(arg => {
-            musicList.sort((x, y) => {
-                return x.id > y.id;
-            });
-            window.ap1.list.add(musicList);
-            window.ap1.list.show();
-        })
+        //fetchList make sure that all the json promise is pushed into jsonList
+        //jsonList make sure that all the music is pushed into array
+        if (fetchList.length != 0) {
+            Promise.all(fetchList).then(arg => {
+                if (jsonList.length != 0) {
+                    Promise.all(jsonList).then(arg => {
+                        musicList.sort((x, y) => {
+                            return x.id > y.id;
+                        });
+                        window.ap1.list.add(musicList);
+                        window.ap1.list.show();
+                    })
+                }
+            })
+        }
 
     })
 }
 
+//待测试
 function operatePlayer() {
     fetch(apiUrl + "getOperation").then((res) => {
         res.json().then((arr) => {

@@ -181,7 +181,7 @@ function handle() {
         return '200';
     }
 
-    this.getOperations() = () => {
+    this.getOperations = () => {
         let ret;
         lock.acquire("operations", (done) => {
             ret = JSON.stringify(operations);
