@@ -18,8 +18,6 @@ docute.init({
     ]
 });
 
-if (window.location.href.indexOf(""))
-
 
 function player() {
     return function(context) {
@@ -111,9 +109,11 @@ function loadPlayer(onlyNew) {
             Promise.all(fetchList).then(arg => {
                 if (jsonList.length != 0) {
                     Promise.all(jsonList).then(arg => {
+                        console.log("before sort", musicList);
                         musicList.sort((x, y) => {
-                            return x.id > y.id;
+                            return x['id'] > y['id'];
                         });
+                        console.log("after sort", musicList);
                         window.ap1.list.add(musicList);
                         window.ap1.list.show();
                     })

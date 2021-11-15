@@ -12,17 +12,19 @@ const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
 const key = fs.readFileSync("./cache/.key")
+const targetVotes = 8;
 
 
 function handle() {
     var canOrder = false,
         maxAmount = 50,
-        personalMax = 3,
+        personalMax = 1,
         g_gc, api, reconnect;
     var currentSong = 0;
     let musicLists = Array()
     let usersLists = Array()
     let operations = Array()
+    let currentVotes = Array();
 
 
     async function getSongTitle(id, type) {
@@ -112,7 +114,7 @@ function handle() {
         // judge if it is ordering time
         if (!canOrder) {
             return '当前时段不可点歌哦😯';
-        } else if (musicLists.length > maxAmount) {
+        } else if (musicLists.length >= maxAmount) {
             return '当前时段点歌数量已达上限🥲';
         }
         if (music === 1) return '🥲暂时不支持该平台';
@@ -172,6 +174,12 @@ function handle() {
         if (currentSong > 1) {
             getMusic(currentSong - 1).played = true;
         }
+        // erase the votes array
+        lock.acquire("votes", (done) => {
+            currentVotes.length = 0;
+            done("no error", 0)
+        }, (res, ret) => {}, null)
+
         api.sendGroupMsg(g_gc, `🅿️正在播放第${id}首歌：` + getMusic(currentSong).music.title);
     }
 
@@ -279,6 +287,34 @@ function handle() {
                     realease("[4]no error", 0)
                 }, (err, ret) => {}, null)
                 return res;
+        }
+
+        let response;
+        if (msg.indexOf("[CQ:at,qq=1687708097]") != -1 && msg.indexOf("切歌") != -1) {
+            if (currentSong == 0) return '👁‍🗨当前没有在播放歌曲';
+            lock.acquire("votes", (done) => {
+                currentVotes.forEach((v, i) => {
+                    if (v.uin == uin) {
+                        done('💬你已经投过票了', 0);
+                        return;
+                    }
+                });
+
+                currentVotes.push({ 'uin': uin });
+                if (currentVotes.length >= targetVotes) {
+                    done(`💫已达到${targetVotes}票，进行切歌`, 1);
+                } else {
+                    done('☄️投票成功', 0);
+                }
+            }, (res, ret) => {
+                response = res;
+                if (ret == 1) {
+                    lock.acquire("operations", (done) => {
+                        operations.push({ type: "next" });
+                        done("[next]no error", 0);
+                    }, (err, ret) => {}, null);
+                }
+            })
         }
     }
 }
