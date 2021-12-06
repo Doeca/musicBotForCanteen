@@ -32,7 +32,7 @@ function server(p_handle) {
         app.get("/reconnect", (req, res) => {
             res.send(handle.reconnectws());
         })
-        app.get("/loginError", (req, res) => {
+        app.get("/notifyLoginErr", (req, res) => {
             res.send(handle.notifyLoginError());
         })
 

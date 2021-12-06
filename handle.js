@@ -185,7 +185,7 @@ function handle() {
     }
 
     this.notifyError = (uin, id) => {
-        api.sendPivateMsg(uin, `😥抱歉，您点的歌曲【` + getMusic(id).music.title + `】加载失败，可稍后重新点歌`);
+        api.sendPrivateMsg(uin, `😥抱歉，您点的歌曲【` + getMusic(id).music.title + `】加载失败，可稍后重新点歌`);
         api.sendGroupMsg(g_gc, `[CQ:at,qq=${uin}] 😥抱歉，您点的歌曲【` + getMusic(id).music.title + `】加载失败，可稍后重新点歌`);
         getUser(uin).num -= 1;
         return '200';
@@ -325,7 +325,7 @@ function handle() {
     }
 
     this.notifyLoginError = () => {
-        api.sendPivateMsg(1124468334, `😥网易云登陆失败，请手动处理！`);
+        api.sendPrivateMsg(1124468334, `😥网易云登陆失败，请手动处理！`);
         return '200';
     }
 }
