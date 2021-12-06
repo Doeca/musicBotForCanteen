@@ -8,16 +8,17 @@ const mqq = [
     /http:\/\/c6.y.qq.com\/rsc\/fcgi-bin\/fcg_pyq_play\.fcg\?songid.*songmid=([0-9a-zA-Z]{1,})/g,
     /https:\/\/i.y.qq.com\/v8\/playsong.html\?platform.*songmid=([a-zA-Z0-9]{1,})/g
 ]
+
 const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
 const key = fs.readFileSync("./cache/.key")
-const targetVotes = 8;
+const targetVotes = 15;
 
 
 function handle() {
     var canOrder = false,
-        maxAmount = 50,
+        maxAmount = 40,
         personalMax = 1,
         g_gc, api, reconnect;
     var currentSong = 0;
@@ -287,24 +288,27 @@ function handle() {
                     realease("[4]no error", 0)
                 }, (err, ret) => {}, null)
                 return res;
+            case '正在播放':
+                if (currentSong == 0) return '👁‍🗨当前没有在播放歌曲';
+                return "🅿️当前歌曲【" + getMusic(currentSong).music.title + "】";
         }
 
         let response;
         if (msg.indexOf("[CQ:at,qq=1687708097]") != -1 && msg.indexOf("切歌") != -1) {
-            if (currentSong == 0) return '👁‍🗨当前没有在播放歌曲';
+            if (currentSong == 0) return `[CQ:at,qq=${uin}] 👁‍🗨当前没有在播放歌曲`;
             lock.acquire("votes", (done) => {
-                currentVotes.forEach((v, i) => {
-                    if (v.uin == uin) {
-                        done('💬你已经投过票了', 0);
+                for (i = 0; i < currentVotes.length; i++) {
+                    if (currentVotes[i].uin == uin) {
+                        done(`[CQ:at,qq=${uin}] 💬你已经投过票了`, 0);
                         return;
                     }
-                });
+                }
 
                 currentVotes.push({ 'uin': uin });
                 if (currentVotes.length >= targetVotes) {
-                    done(`💫已达到${targetVotes}票，进行切歌`, 1);
+                    done(`[CQ:at,qq=${uin}] 💫已达到${targetVotes}票，进行切歌`, 1)
                 } else {
-                    done('☄️投票成功', 0);
+                    done(`[CQ:at,qq=${uin}] ☄️投票成功，当前：${currentVotes.length}/${targetVotes}`, 0)
                 }
             }, (res, ret) => {
                 response = res;
@@ -316,6 +320,13 @@ function handle() {
                 }
             })
         }
+
+        return response;
+    }
+
+    this.notifyLoginError = () => {
+        api.sendPivateMsg(1124468334, `😥网易云登陆失败，请手动处理！`);
+        return '200';
     }
 }
 

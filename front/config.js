@@ -75,7 +75,12 @@ function loadPlayer(onlyNew) {
         let fetchList = Array(); // for sort
         let jsonList = Array();
         arr.forEach((val, index) => {
-            let url = "https://api.i-meto.com/meting/api?server=" + (val.music.type == 1 ? 'netease' : "tencent") + "&type=song&id=" + val.music.id + "&r=" + Math.random();
+            if (val.music.type == 1) {
+                let url = "https://m163.doeca.cc/song?id=" + val.music.id;
+            } else if (val.music.type == 2) {
+                let url = "https://api.i-meto.com/meting/api?server=tencent&type=song&id=" + val.music.id + "&r=" + Math.random();
+            }
+            //https://api.i-meto.com/meting/api?server=tencent&type=song&id=001RGrEX3ija5X
             let fetchPromise = fetch(url, {
                 mode: "cors"
             });
@@ -109,12 +114,29 @@ function loadPlayer(onlyNew) {
             Promise.all(fetchList).then(arg => {
                 if (jsonList.length != 0) {
                     Promise.all(jsonList).then(arg => {
-                        console.log("before sort", musicList);
+                        /*
                         musicList.sort((x, y) => {
-                            return x['id'] > y['id'];
+                            if (x.id < y.id) {
+                                return -1;
+                            } else if (x.id > y.id) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
                         });
-                        console.log("after sort", musicList);
+
                         window.ap1.list.add(musicList);
+                        */
+                        window.ap1.list.add(musicList);
+                        window.ap1.list.sort((x, y) => {
+                            if (x.id < y.id) {
+                                return -1;
+                            } else if (x.id > y.id) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
                         window.ap1.list.show();
                     })
                 }

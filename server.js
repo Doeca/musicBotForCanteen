@@ -30,8 +30,12 @@ function server(p_handle) {
             res.send(handle.notifyError(req.query.uin, req.query.id));
         })
         app.get("/reconnect", (req, res) => {
-            res.send(handle.reconnectws())
+            res.send(handle.reconnectws());
         })
+        app.get("/loginError", (req, res) => {
+            res.send(handle.notifyLoginError());
+        })
+
 
 
     }
