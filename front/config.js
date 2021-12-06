@@ -75,10 +75,11 @@ function loadPlayer(onlyNew) {
         let fetchList = Array(); // for sort
         let jsonList = Array();
         arr.forEach((val, index) => {
+            let url = '';
             if (val.music.type == 1) {
-                let url = "https://m163.doeca.cc/song?id=" + val.music.id;
+                url = "https://m163.doeca.cc/song?id=" + val.music.id;
             } else if (val.music.type == 2) {
-                let url = "https://api.i-meto.com/meting/api?server=tencent&type=song&id=" + val.music.id + "&r=" + Math.random();
+                url = "https://api.i-meto.com/meting/api?server=tencent&type=song&id=" + val.music.id + "&r=" + Math.random();
             }
             //https://api.i-meto.com/meting/api?server=tencent&type=song&id=001RGrEX3ija5X
             let fetchPromise = fetch(url, {
