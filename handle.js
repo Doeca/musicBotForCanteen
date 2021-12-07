@@ -120,7 +120,7 @@ function handle() {
         }
         if (music === 1) return '🥲暂时不支持该平台';
         // judge if the user is in the offical group and if the user order the excessive music.
-        if (ignore) {
+        if (!ignore) {
             let memInf = await api.getGroupMemberInfo(g_gc, uin);
             if (memInf.data == null) return '不在群里无法点歌';
         }

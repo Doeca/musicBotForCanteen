@@ -115,7 +115,7 @@ function loadPlayer(onlyNew) {
             Promise.all(fetchList).then(arg => {
                 if (jsonList.length != 0) {
                     Promise.all(jsonList).then(arg => {
-                        /*
+
                         musicList.sort((x, y) => {
                             if (x.id < y.id) {
                                 return -1;
@@ -127,17 +127,19 @@ function loadPlayer(onlyNew) {
                         });
 
                         window.ap1.list.add(musicList);
-                        */
-                        window.ap1.list.add(musicList);
-                        window.ap1.list.sort((x, y) => {
-                            if (x.id < y.id) {
-                                return -1;
-                            } else if (x.id > y.id) {
-                                return 1;
-                            } else {
-                                return 0;
-                            }
-                        });
+
+                        /*
+                         window.ap1.list.add(musicList);
+                         window.ap1.list.sort((x, y) => {
+                             if (x.id < y.id) {
+                                 return -1;
+                             } else if (x.id > y.id) {
+                                 return 1;
+                             } else {
+                                 return 0;
+                             }
+                         });
+                         */
                         window.ap1.list.show();
                     })
                 }
