@@ -79,9 +79,9 @@ function loadPlayer(onlyNew) {
             if (val.music.type == 1) {
                 url = "https://m163.doeca.cc/song?id=" + val.music.id + "&key=" + key;
             } else if (val.music.type == 2) {
-                url = "https://api.i-meto.com/meting/api?server=tencent&type=song&id=" + val.music.id + "&r=" + Math.random();
+                url = "https://mqq.doeca.cc/song?id=" + val.music.id + "&key=" + key;
             }
-            //https://api.i-meto.com/meting/api?server=tencent&type=song&id=001RGrEX3ija5X
+
             let fetchPromise = fetch(url, {
                 mode: "cors"
             });

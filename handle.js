@@ -328,6 +328,11 @@ function handle() {
         api.sendPrivateMsg(1124468334, `😥网易云登陆失败，请手动处理！`);
         return '200';
     }
+
+    this.notifyQQerror = () => {
+        api.sendPrivateMsg(1124468334, `😥QQ音乐Cookies过期，请手动处理！`);
+        return '200';
+    }
 }
 
 
