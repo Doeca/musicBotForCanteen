@@ -77,7 +77,7 @@ function loadPlayer(onlyNew) {
         arr.forEach((val, index) => {
             let url = '';
             if (val.music.type == 1) {
-                url = "https://m163.doeca.cc/song?id=" + val.music.id;
+                url = "https://m163.doeca.cc/song?id=" + val.music.id + "&key=" + key;
             } else if (val.music.type == 2) {
                 url = "https://api.i-meto.com/meting/api?server=tencent&type=song&id=" + val.music.id + "&r=" + Math.random();
             }
@@ -97,9 +97,9 @@ function loadPlayer(onlyNew) {
                     musicList.push({
                         "name": inf[0].title,
                         "artist": inf[0].author,
-                        "url": inf[0].url,
+                        "url": inf[0].url + "&key=" + key,
                         "cover": inf[0].pic,
-                        "lrc": inf[0].lrc,
+                        "lrc": inf[0].lrc + "&key=" + key,
                         "id": val.id
                     })
 
@@ -140,6 +140,7 @@ function loadPlayer(onlyNew) {
                              }
                          });
                          */
+
                         window.ap1.list.show();
                     })
                 }
