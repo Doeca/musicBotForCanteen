@@ -152,7 +152,7 @@ function handle() {
         return `🎶点歌成功，点歌序号：${id}`;
     }
 
-    this.clearList() = () => {
+    this.clearList = () => {
         lock.acquire("operations", (done) => {
             operations.push({ type: "clear" });
             done("[last]no error", 0);
