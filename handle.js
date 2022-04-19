@@ -335,6 +335,8 @@ function handle() {
 
 
     this.notifyQQStatus = (status) => {
+        if (qqType == status)
+            return '200';
         qqType = status;
         if (qqType != 1)
             api.sendGroupMsg(g_gc, `🤥(悲)QQ音乐目前处于故障状态，请大家使用网易云点歌`);
