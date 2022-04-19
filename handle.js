@@ -14,7 +14,7 @@ const axios = require("axios").default
 const fs = require('fs')
 const key = fs.readFileSync("./cache/.key")
 const targetVotes = 7;
-const qqType = 1;
+let qqType = 1;
 
 
 function handle() {
