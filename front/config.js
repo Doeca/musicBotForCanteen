@@ -131,7 +131,11 @@ function loadPlayer(onlyNew) {
                         });
 
                         musicList.forEach((val, index) => {
-                            res = window.ap1.list.audio.filter((item) => item.id == val.id).length;
+                            let res = 0;
+                            try {
+                                res = window.ap1.list.audio.filter((item) => item.id == val.id).length;
+                            } catch (err) {}
+
                             if (res == 0)
                                 windows.ap1.list.add(val);
                         })
