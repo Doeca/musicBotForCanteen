@@ -133,7 +133,7 @@ function loadPlayer(onlyNew) {
                         musicList.forEach((val, index) => {
                             let res = 0;
                             try {
-                                res = window.ap1.list.audio.filter((item) => item.id == val.id).length;
+                                res = window.ap1.list.audios.filter((item) => item.id == val.id).length;
                             } catch (err) {}
 
                             if (res == 0)
