@@ -139,8 +139,6 @@ function loadPlayer(onlyNew) {
                             if (res == 0)
                                 window.ap1.list.add(val);
                         })
-
-                        window.ap1.list.show();
                     })
                 }
             })
@@ -156,6 +154,7 @@ function operatePlayer() {
             if (arr == null) return;
             if (arr.length != 0) {
                 arr.forEach((v, i) => {
+                    if (v.type == 'clear') window.ap1.clear();
                     if (v.type == 'toggle') window.ap1.toggle();
                     if (v.type == 'next') window.ap1.skipForward();
                     if (v.type == 'last') window.ap1.skipBack();

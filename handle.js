@@ -152,6 +152,13 @@ function handle() {
         return `🎶点歌成功，点歌序号：${id}`;
     }
 
+    this.clearList() = () => {
+        lock.acquire("operations", (done) => {
+            operations.push({ type: "clear" });
+            done("[last]no error", 0);
+        }, (err, ret) => {}, null);
+    }
+
     this.getMusicList = (erase = false, onlyNew = true, pk) => {
         //获取所有歌 或 获取没有播放的歌
         //console.log(musicLists);
