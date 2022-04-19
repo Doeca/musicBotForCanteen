@@ -13,7 +13,8 @@ const lock = new(require('async-lock'))()
 const axios = require("axios").default
 const fs = require('fs')
 const key = fs.readFileSync("./cache/.key")
-const targetVotes = 15;
+const targetVotes = 7;
+const qqType = 1;
 
 
 function handle() {
@@ -128,6 +129,9 @@ function handle() {
         if (user.num >= personalMax) return `😗每时段内每人仅可点${personalMax}首歌哦！`;
         user.num += 1;
 
+        //check the qq status
+        if (qqType != 1 && music.type == 2)
+            return '🥲QQ音乐目前故障中，请稍后再试';
         // add the music to the list
         let title = await getSongTitle(music.id, music.type);
         if (title == "") throw ("未找到该歌曲信息（可能是VIP歌曲）");
@@ -152,19 +156,7 @@ function handle() {
         //获取所有歌 或 获取没有播放的歌
         //console.log(musicLists);
         if (pk != key) return;
-        if (onlyNew) {
-            let arr = Array();
-            musicLists.forEach((val, index) => {
-                if (!val.fetched) {
-                    musicLists[index].fetched = true;
-                    arr.push(val);
-                }
-            })
-            return JSON.stringify(arr);
-        } else {
-            return musicLists;
-        }
-
+        return musicLists;
     }
 
     this.setMusicStatus = (id) => {
@@ -256,6 +248,8 @@ function handle() {
                     }, (err, ret) => {}, null);
 
                     return '✅切换至上一首歌';
+                case `/black`:
+                    break;
                 default:
 
             }
@@ -268,6 +262,16 @@ function handle() {
                 }, (err, ret) => {}, null);
                 return '✅切换至第' + id + "首歌";
             }
+
+            if (msg.indexOf("/volume") == 0) {
+                let id = msg.replace("/volume", "");
+                lock.acquire("operations", (done) => {
+                    operations.push({ type: "volume", para: id });
+                    done("no error", 0);
+                }, (err, ret) => {}, null);
+                return '✅音量调整为' + id + "%";
+            }
+
         }
 
         switch (msg) {
@@ -294,7 +298,7 @@ function handle() {
         }
 
         let response;
-        if (msg.indexOf("[CQ:at,qq=1687708097]") != -1 && msg.indexOf("切歌") != -1) {
+        if ((msg.indexOf("[CQ:at,qq=1687708097]") != -1 && msg.indexOf("切歌") != -1) || msg == `/vote`) {
             if (currentSong == 0) return `[CQ:at,qq=${uin}] 👁‍🗨当前没有在播放歌曲`;
             lock.acquire("votes", (done) => {
                 for (i = 0; i < currentVotes.length; i++) {
@@ -329,8 +333,13 @@ function handle() {
         return '200';
     }
 
-    this.notifyQQerror = () => {
-        api.sendPrivateMsg(1124468334, `😥QQ音乐Cookies过期，请手动处理！`);
+
+    this.notifyQQStatus = (status) => {
+        qqType = status;
+        if (qqType != 1)
+            api.sendGroupMsg(g_gc, `🤥(悲)QQ音乐目前处于故障状态，请大家使用网易云点歌`);
+        else
+            api.sendGroupMsg(g_gc, `🫣(乐)QQ音乐已恢复正常`);
         return '200';
     }
 }

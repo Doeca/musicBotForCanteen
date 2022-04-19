@@ -35,9 +35,8 @@ function server(p_handle) {
         app.get("/notifyLoginErr", (req, res) => {
             res.send(handle.notifyLoginError());
         })
-
-        app.get("/notifyQQerror", (req, res) => {
-            res.send(handle.notifyQQerror());
+        app.get("/notifyQQStatus", (req, res) => {
+            res.send(handle.notifyQQStatus(req.query.status));
         })
 
     }

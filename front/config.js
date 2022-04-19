@@ -62,7 +62,7 @@ function postInf(path, type, msg) {
 
 
 function loadPlayer(onlyNew) {
-    fetch(apiUrl + "getMusicList?key=" + key + "&erase=0&onlyNew=" + (onlyNew === 0 ? 0 : 1)).then((res) => {
+    fetch(apiUrl + "getMusicList?key=" + key + "&erase=0").then((res) => {
         if (res.status != 200) {
             alert('获取歌曲列表失败，请重载网页！');
             return;
@@ -74,6 +74,11 @@ function loadPlayer(onlyNew) {
         let musicList = Array();
         let fetchList = Array(); // for sort
         let jsonList = Array();
+
+        //path : fetch all the song urls and make a promise list to wait for
+        //in every promise there is a promise waiting for the json text generated
+
+
         arr.forEach((val, index) => {
             let url = '';
             if (val.music.type == 1) {
@@ -85,6 +90,7 @@ function loadPlayer(onlyNew) {
             let fetchPromise = fetch(url, {
                 mode: "cors"
             });
+
             fetchPromise.then(resp => {
                 let jsonPromise = resp.json();
                 jsonPromise.then(inf => {
@@ -115,31 +121,20 @@ function loadPlayer(onlyNew) {
             Promise.all(fetchList).then(arg => {
                 if (jsonList.length != 0) {
                     Promise.all(jsonList).then(arg => {
-
                         musicList.sort((x, y) => {
-                            if (x.id < y.id) {
+                            if (x.id < y.id)
                                 return -1;
-                            } else if (x.id > y.id) {
+                            else if (x.id > y.id)
                                 return 1;
-                            } else {
+                            else
                                 return 0;
-                            }
                         });
 
-                        window.ap1.list.add(musicList);
-
-                        /*
-                         window.ap1.list.add(musicList);
-                         window.ap1.list.sort((x, y) => {
-                             if (x.id < y.id) {
-                                 return -1;
-                             } else if (x.id > y.id) {
-                                 return 1;
-                             } else {
-                                 return 0;
-                             }
-                         });
-                         */
+                        musicList.forEach((val, index) => {
+                            res = window.ap1.list.audio.filter((item) => item.id == val.id).length;
+                            if (res == 0)
+                                windows.ap1.list.add(val);
+                        })
 
                         window.ap1.list.show();
                     })
@@ -150,7 +145,7 @@ function loadPlayer(onlyNew) {
     })
 }
 
-//待测试
+
 function operatePlayer() {
     fetch(apiUrl + "getOperations?key=" + key).then((res) => {
         res.json().then((arr) => {
