@@ -137,7 +137,7 @@ function loadPlayer(onlyNew) {
                             } catch (err) {}
 
                             if (res == 0)
-                                windows.ap1.list.add(val);
+                                window.ap1.list.add(val);
                         })
 
                         window.ap1.list.show();
