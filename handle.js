@@ -20,7 +20,7 @@ let qqType = 1;
 function handle() {
     var canOrder = false,
         maxAmount = 40,
-        personalMax = 1,
+        personalMax = 2,
         g_gc, api, reconnect;
     var currentSong = 0;
     let musicLists = Array()

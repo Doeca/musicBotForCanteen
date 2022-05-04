@@ -59,6 +59,7 @@ ws.on('connect', (client) => {
                             api.sendGroupMsg(g_gc, '[CQ:at,qq=' + inf.sender.user_id + '] ' + msg);
                         }
                     }).catch((err) => {
+                        handle.getUser(inf.sender.user_id).num -= 1;
                         let msg = `Error caught\nerr:${err}`;
                         api.sendPrivateMsg(1124468334, msg);
                         api.sendGroupMsg(g_gc, '[CQ:at,qq=' + inf.sender.user_id + ']🤒点歌失败，请稍后再试\n失败原因：' + err);
@@ -70,6 +71,7 @@ ws.on('connect', (client) => {
                         if (msg != '') api.sendPrivateMsg(inf.sender.user_id, msg);
                     }).catch((err) => {
                         let msg = `Error caught\nerr:${err}`;
+                        handle.getUser(inf.sender.user_id).num -= 1;
                         api.sendPrivateMsg(1124468334, msg);
                         api.sendPrivateMsg(inf.sender.user_id, '🤒点歌失败，请稍后再试\n失败原因：' + err);
                     });
