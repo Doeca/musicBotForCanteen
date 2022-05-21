@@ -8,11 +8,6 @@ docute.init({
     title: '小老虎食堂音乐播放器',
     nav: {},
     plugins: [
-        docsearch({
-            apiKey: '',
-            indexName: 'aplayer',
-            url: 'https://aplayer.js.org'
-        }),
         evanyou(),
         player()
     ]
